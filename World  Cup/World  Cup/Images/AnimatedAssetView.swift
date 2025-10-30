@@ -8,27 +8,30 @@ public struct AnimatedAssetView: UIViewRepresentable {
     public var loopMode: LottieLoopMode = .loop
     public var speed: CGFloat = 1.0
     public var contentMode: UIView.ContentMode = .scaleAspectFill
+    public var allowOverflow: Bool = false
 
     public init(name: String,
                 loopMode: LottieLoopMode = .loop,
                 speed: CGFloat = 1.0,
-                contentMode: UIView.ContentMode = .scaleAspectFill) {
+                contentMode: UIView.ContentMode = .scaleAspectFill,
+                allowOverflow: Bool = false) {
         self.name = name
         self.loopMode = loopMode
         self.speed = speed
         self.contentMode = contentMode
+        self.allowOverflow = allowOverflow
     }
 
     public func makeUIView(context: Context) -> UIView {
         // Contenedor fijo que sigue el frame de SwiftUI
         let container = UIView()
         container.backgroundColor = .clear
-        container.clipsToBounds = true
+        container.clipsToBounds = !allowOverflow
 
         let animationView = LottieAnimationView()
         animationView.translatesAutoresizingMaskIntoConstraints = false
         animationView.contentMode = contentMode
-        animationView.clipsToBounds = true
+        animationView.clipsToBounds = !allowOverflow
         animationView.loopMode = loopMode
         animationView.animationSpeed = speed
 
@@ -58,7 +61,7 @@ public struct AnimatedAssetView: UIViewRepresentable {
         // Buscar el LottieAnimationView hijo
         guard let animationView = uiView.subviews.first(where: { $0 is LottieAnimationView }) as? LottieAnimationView else { return }
         animationView.contentMode = contentMode
-        animationView.clipsToBounds = true
+        animationView.clipsToBounds = !allowOverflow
         animationView.loopMode = loopMode
         animationView.animationSpeed = speed
         if animationView.animation == nil, let animation = LottieAnimation.named(name, bundle: .main) {

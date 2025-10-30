@@ -11,7 +11,7 @@ import SwiftUI
 struct World__CupApp: App {
     var body: some Scene {
         WindowGroup {
-            HomeScreen()
+            AccessibleRouteScreen()
         }
     }
 }
