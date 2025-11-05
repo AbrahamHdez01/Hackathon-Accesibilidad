@@ -13,6 +13,8 @@ struct BottomBar: View {
                 NavigationLink(destination: NarratorView()) {
                     icon("megaphone.fill")
                 }
+                .accessibilityLabel("Narrador Universal")
+                .accessibilityHint("Doble toque para abrir la pantalla del Narrador Universal y escuchar narraciones de partidos")
 
                 // Mapa (centro y principal)
                 NavigationLink(destination: AccessibleRouteScreen()) {
@@ -20,11 +22,15 @@ struct BottomBar: View {
                         .font(.system(size: 24, weight: .semibold))
                         .frame(maxWidth: .infinity)
                 }
+                .accessibilityLabel("Ruta Accesible")
+                .accessibilityHint("Doble toque para abrir el mapa con rutas accesibles del estadio")
 
                 // Chatbot (derecha)
                 NavigationLink(destination: ChatAssistantView()) {
                     icon("message.fill")
                 }
+                .accessibilityLabel("Asistente Multilingüe")
+                .accessibilityHint("Doble toque para abrir el asistente conversacional multilingüe")
             }
             .padding(.vertical, 14)
             .padding(.horizontal, 22)
