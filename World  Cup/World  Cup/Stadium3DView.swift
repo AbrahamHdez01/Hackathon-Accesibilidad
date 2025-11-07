@@ -204,26 +204,36 @@ struct Stadium3DView: UIViewRepresentable {
         context.coordinator.poiNodes.forEach { $0.removeFromParentNode() }
         context.coordinator.poiNodes.removeAll()
         
-        // Crear marcadores para cada POI
-        for poi in poiService.pois {
-            let markerNode = createPOIMarker(for: poi)
+        // Solo mostrar POIs seleccionados (inicio y fin)
+        if let startPOI = poiService.selectedStartPOI {
+            let markerNode = createPOIMarker(for: startPOI, isStart: true, isEnd: false)
+            scene.rootNode.addChildNode(markerNode)
+            context.coordinator.poiNodes.append(markerNode)
+        }
+        
+        if let endPOI = poiService.selectedEndPOI {
+            let markerNode = createPOIMarker(for: endPOI, isStart: false, isEnd: true)
             scene.rootNode.addChildNode(markerNode)
             context.coordinator.poiNodes.append(markerNode)
         }
     }
     
-    private func createPOIMarker(for poi: POI) -> SCNNode {
+    private func createPOIMarker(for poi: POI, isStart: Bool, isEnd: Bool) -> SCNNode {
         // Crear marcador visible en el mapa
         let markerGroup = SCNNode()
         
         // Esfera principal (más grande y visible)
-        let sphere = SCNSphere(radius: 0.5)
+        let sphere = SCNSphere(radius: 0.6)
         let material = SCNMaterial()
-        let accessibleColor = UIColor(red: 0.66, green: 1.0, blue: 0.24, alpha: 1.0)
-        let standardColor = UIColor(red: 0.0, green: 0.5, blue: 1.0, alpha: 1.0) // Azul para estándar
         
-        material.diffuse.contents = poi.accessibility.wheelchairAccessible ? accessibleColor : standardColor
-        material.emission.contents = poi.accessibility.wheelchairAccessible ? accessibleColor.withAlphaComponent(0.5) : standardColor.withAlphaComponent(0.5)
+        // Color según tipo (inicio = verde, fin = azul)
+        let startColor = UIColor(red: 0.66, green: 1.0, blue: 0.24, alpha: 1.0) // Verde
+        let endColor = UIColor(red: 0.0, green: 0.5, blue: 1.0, alpha: 1.0) // Azul
+        
+        let nodeColor = isStart ? startColor : (isEnd ? endColor : (poi.accessibility.wheelchairAccessible ? startColor : endColor))
+        
+        material.diffuse.contents = nodeColor
+        material.emission.contents = nodeColor.withAlphaComponent(0.8)
         material.transparency = 0.9
         sphere.materials = [material]
         
@@ -232,40 +242,54 @@ struct Stadium3DView: UIViewRepresentable {
         markerGroup.addChildNode(sphereNode)
         
         // Cilindro base más grande para que se vea mejor en el suelo
-        let cylinder = SCNCylinder(radius: 0.4, height: 0.15)
+        let cylinder = SCNCylinder(radius: 0.5, height: 0.15)
         let baseMaterial = SCNMaterial()
-        baseMaterial.diffuse.contents = poi.accessibility.wheelchairAccessible ? accessibleColor : standardColor
-        baseMaterial.emission.contents = poi.accessibility.wheelchairAccessible ? accessibleColor.withAlphaComponent(0.5) : standardColor.withAlphaComponent(0.5)
+        baseMaterial.diffuse.contents = nodeColor
+        baseMaterial.emission.contents = nodeColor.withAlphaComponent(0.6)
         cylinder.materials = [baseMaterial]
         
         let baseNode = SCNNode(geometry: cylinder)
         baseNode.position = SCNVector3(0, 0.075, 0) // En el suelo
         markerGroup.addChildNode(baseNode)
         
-        // Nombre del POI como texto flotante (más visible)
-        let text = SCNText(string: poi.name, extrusionDepth: 0.05)
-        text.font = UIFont.systemFont(ofSize: 0.8, weight: .semibold)
+        // Texto distintivo: INICIO o FIN
+        let labelText = isStart ? "INICIO" : (isEnd ? "FIN" : poi.name)
+        let text = SCNText(string: labelText, extrusionDepth: 0.05)
+        text.font = UIFont.systemFont(ofSize: 1.0, weight: .bold)
         text.firstMaterial?.diffuse.contents = UIColor.white
-        text.firstMaterial?.emission.contents = UIColor.white.withAlphaComponent(0.5)
+        text.firstMaterial?.emission.contents = UIColor.white.withAlphaComponent(0.8)
         
         let textNode = SCNNode(geometry: text)
-        // Ajustar posición del texto para que esté centrado
         let textBounds = text.boundingBox
         let textWidth = textBounds.max.x - textBounds.min.x
-        textNode.position = SCNVector3(-textWidth * 0.05, 1.2, 0) // Más arriba y centrado
-        textNode.scale = SCNVector3(x: 0.08, y: 0.08, z: 0.08)
+        textNode.position = SCNVector3(-textWidth * 0.05, 1.5, 0) // Más arriba
+        textNode.scale = SCNVector3(x: 0.1, y: 0.1, z: 0.1)
         
-        // Fondo para el texto (rectángulo)
-        let textBackground = SCNPlane(width: CGFloat(textWidth * 0.08) + 0.5, height: 0.3)
+        // Fondo para el texto con color distintivo
+        let textBackground = SCNPlane(width: CGFloat(textWidth * 0.1) + 1.0, height: 0.4)
         let bgMaterial = SCNMaterial()
-        bgMaterial.diffuse.contents = UIColor.black.withAlphaComponent(0.7)
+        bgMaterial.diffuse.contents = nodeColor.withAlphaComponent(0.9)
+        bgMaterial.emission.contents = nodeColor.withAlphaComponent(0.3)
         textBackground.materials = [bgMaterial]
         
         let bgNode = SCNNode(geometry: textBackground)
-        bgNode.position = SCNVector3(-textWidth * 0.04, 1.2, -0.01)
+        bgNode.position = SCNVector3(-textWidth * 0.05, 1.5, -0.01)
         bgNode.eulerAngles = SCNVector3(-Float.pi / 2, 0, 0) // Rotar para que sea horizontal
         markerGroup.addChildNode(bgNode)
         markerGroup.addChildNode(textNode)
+        
+        // Nombre del POI debajo del distintivo
+        let nameText = SCNText(string: poi.name, extrusionDepth: 0.03)
+        nameText.font = UIFont.systemFont(ofSize: 0.6, weight: .semibold)
+        nameText.firstMaterial?.diffuse.contents = UIColor.white
+        nameText.firstMaterial?.emission.contents = UIColor.white.withAlphaComponent(0.5)
+        
+        let nameTextNode = SCNNode(geometry: nameText)
+        let nameTextBounds = nameText.boundingBox
+        let nameTextWidth = nameTextBounds.max.x - nameTextBounds.min.x
+        nameTextNode.position = SCNVector3(-nameTextWidth * 0.03, 1.0, 0)
+        nameTextNode.scale = SCNVector3(x: 0.06, y: 0.06, z: 0.06)
+        markerGroup.addChildNode(nameTextNode)
         
         // Posicionar el grupo en las coordenadas del POI
         // Asegurar que los puntos estén en el suelo (y = 0 o muy cerca del suelo)
@@ -332,9 +356,14 @@ struct Stadium3DView: UIViewRepresentable {
             let cylinderNode = SCNNode(geometry: cylinder)
             
             // Posicionar el cilindro en el punto medio
+            // Asegurar que las rutas exteriores estén en el suelo
+            let isExteriorRoute = abs(startPoint.x) > 10 || abs(startPoint.z) > 10 || abs(endPoint.x) > 10 || abs(endPoint.z) > 10
+            let startY = isExteriorRoute ? 0.0 : startPoint.y
+            let endY = isExteriorRoute ? 0.0 : endPoint.y
+            
             let midPoint = SCNVector3(
                 (startPoint.x + endPoint.x) / 2,
-                (startPoint.y + endPoint.y) / 2,
+                (startY + endY) / 2,
                 (startPoint.z + endPoint.z) / 2
             )
             cylinderNode.position = midPoint
@@ -376,8 +405,10 @@ struct Stadium3DView: UIViewRepresentable {
             sphere.materials = [sphereMaterial]
             
             let sphereNode = SCNNode(geometry: sphere)
-            // Asegurar que estén en el suelo o en la altura correcta
-            let groundY: Float = max(0.0, point.position.y)
+            // Asegurar que estén en el suelo - todas las rutas deben estar en y=0
+            // Para rutas exteriores, siempre en el suelo
+            let isExteriorRoute = abs(point.position.x) > 10 || abs(point.position.z) > 10
+            let groundY: Float = isExteriorRoute ? 0.0 : max(0.0, point.position.y)
             sphereNode.position = SCNVector3(
                 point.position.x,
                 groundY + 0.4,
@@ -514,8 +545,9 @@ struct Stadium3DView: UIViewRepresentable {
             guard let cameraNode = cameraNode else { return }
             if gesture.state == .changed {
                 let factor = Float(gesture.scale)
-                // Reducir la sensibilidad del zoom multiplicando el factor por 0.5
-                let proposed = currentDistance * pow(zoomSpeed, (1 - factor) * 1.0) // Reducido de 2.0 a 1.0
+                // Corregir zoom invertido: cuando factor > 1 (pinch out) debe acercar (reducir distancia)
+                // Cuando factor < 1 (pinch in) debe alejar (aumentar distancia)
+                let proposed = currentDistance / factor // Invertir la lógica
                 currentDistance = max(minDistance, min(maxDistance, proposed))
                 cameraNode.position.z = currentDistance
                 gesture.scale = 1.0

@@ -6,6 +6,7 @@ struct AccessibleRouteScreen: View {
     @State private var selectedMode: Mode = .accessible
     @State private var currentRoute: Route?
     @State private var showPOIList = false
+    @State private var showRouteDetails = false
 
     var body: some View {
         NavigationStack {
@@ -131,37 +132,60 @@ struct AccessibleRouteScreen: View {
                     }
                     .allowsHitTesting(false) // No bloquear gestos del mapa
                     
-                    // Información de ruta calculada (flotante en la parte inferior)
+                    // Botón desplegable de ruta calculada (flotante en la parte inferior)
                     VStack {
                         Spacer()
                         
                         if let route = currentRoute {
-                            VStack(alignment: .leading, spacing: 8) {
-                                HStack {
-                                    Text("Ruta calculada")
-                                        .font(.headline)
-                                        .foregroundColor(.routeText)
-                                    Spacer()
-                                    Text("\(Int(route.estimatedTime / 60)) min")
-                                        .font(.caption)
-                                        .foregroundColor(.routeMuted)
-                                }
-                                
-                                ScrollView(.horizontal, showsIndicators: false) {
-                                    HStack(spacing: 8) {
-                                        ForEach(route.instructions, id: \.self) { instruction in
-                                            Text(instruction)
+                            VStack(spacing: 0) {
+                                // Botón para expandir/colapsar
+                                Button(action: {
+                                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                                        showRouteDetails.toggle()
+                                    }
+                                }) {
+                                    HStack {
+                                        Text("Ruta calculada")
+                                            .font(.headline)
+                                            .foregroundColor(.routeText)
+                                        Spacer()
+                                        HStack(spacing: 8) {
+                                            Text("\(Int(route.estimatedTime / 60)) min")
                                                 .font(.caption)
-                                                .foregroundColor(.routeText)
-                                                .padding(.horizontal, 12)
-                                                .padding(.vertical, 6)
-                                                .liquidGlass(intensity: .light, cornerRadius: 8, padding: 0)
+                                                .foregroundColor(.routeMuted)
+                                            Image(systemName: showRouteDetails ? "chevron.down" : "chevron.up")
+                                                .font(.caption)
+                                                .foregroundColor(.accessibleLime)
                                         }
                                     }
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 12)
+                                }
+                                
+                                // Contenido desplegable
+                                if showRouteDetails {
+                                    VStack(alignment: .leading, spacing: 8) {
+                                        Divider()
+                                            .background(Color.routeMuted.opacity(0.3))
+                                        
+                                        ScrollView(.horizontal, showsIndicators: false) {
+                                            HStack(spacing: 8) {
+                                                ForEach(route.instructions, id: \.self) { instruction in
+                                                    Text(instruction)
+                                                        .font(.caption)
+                                                        .foregroundColor(.routeText)
+                                                        .padding(.horizontal, 12)
+                                                        .padding(.vertical, 6)
+                                                        .liquidGlass(intensity: .light, cornerRadius: 8, padding: 0)
+                                                }
+                                            }
+                                        }
+                                    }
+                                    .padding(.horizontal, 16)
+                                    .padding(.bottom, 12)
+                                    .transition(.opacity.combined(with: .move(edge: .bottom)))
                                 }
                             }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 12)
                             .liquidGlass(intensity: .medium, cornerRadius: 16, padding: 0)
                             .padding(.horizontal, 16)
                             .padding(.bottom, 100) // Por encima del tab bar
