@@ -20,28 +20,43 @@ struct NarratorView: View {
     @State private var subtitleTimer: Timer?
     @State private var lastSubtitleIndex: Int = -1
     
+    // Sintetizador nativo como fallback por idioma
+    @State private var nativeSynthesizer: AVSpeechSynthesizer?
+    
     var body: some View {
         ZStack {
-            Color.routeDarkGreen.ignoresSafeArea()
+            // Fondo con gradiente USA (Navy profundo)
+            LinearGradient.usaBackground
+                .ignoresSafeArea()
+            
+            // Micro-estrellas difuminadas
+            StarsPattern()
+                .opacity(0.3)
+                .ignoresSafeArea()
+            
+            // Banda diagonal "broadcast"
+            BroadcastBand()
+                .opacity(0.4)
+                .ignoresSafeArea()
             
             VStack(spacing: 0) {
                 // Título
                 Text("Narrador Universal")
-                    .font(.system(size: 28, weight: .bold, design: .rounded))
-                    .foregroundColor(.routeText)
-                    .padding(.top)
-                    .padding(.bottom, 8)
+                    .font(.worldCupTitle)
+                    .foregroundColor(.wc_textPrimary)
+                    .padding(.top, 20)
+                    .padding(.bottom, 16)
                     .accessibilityAddTraits(.isHeader)
                 
-                // Selector de categorías
+                // Selector de categorías con estilo mejorado
                 Picker("Categoría", selection: $selectedCategory) {
                     Text("En vivo").tag(MatchStatus.live)
                     Text("Próximamente").tag(MatchStatus.upcoming)
                     Text("Anteriores").tag(MatchStatus.previous)
                 }
                 .pickerStyle(.segmented)
-                .padding(.horizontal)
-                .padding(.bottom, 16)
+                .padding(.horizontal, 20)
+                .padding(.bottom, 20)
                 .accessibilityLabel("Selector de categoría de partidos")
                 .accessibilityHint("Desliza para cambiar entre En vivo, Próximamente y Anteriores")
                 .onChange(of: selectedCategory) { _ in
@@ -69,16 +84,16 @@ struct NarratorView: View {
                     }
                 }
                 
-                // Toggle de haptics
+                // Toggle de haptics con estilo mejorado
                 HStack {
                     Toggle("Haptics", isOn: $captions.enableHaptics)
                         .toggleStyle(.switch)
-                        .tint(.accessibleLime)
+                        .tint(.wc_usaRed)
                         .accessibilityLabel("Haptics")
                         .accessibilityHint("Activa o desactiva las vibraciones al recibir eventos de alta intensidad")
                 }
-                .padding(.horizontal)
-                .padding(.bottom, 8)
+                .padding(.horizontal, 20)
+                .padding(.bottom, 16)
                 
                 // Lista de partidos - Siempre visible con padding dinámico
                 ScrollView {
@@ -101,22 +116,22 @@ struct NarratorView: View {
                 
                 // Mensaje para partidos no activos
                 if let match = selectedMatch, !match.isActive {
-                    VStack(spacing: 8) {
+                    VStack(spacing: 12) {
                         Image(systemName: "info.circle.fill")
                             .font(.title2)
-                            .foregroundColor(.routeMuted)
+                            .foregroundColor(.wc_textSecondary)
                             .accessibilityHidden(true)
                         Text("Este partido aún no está disponible")
-                            .font(.headline)
-                            .foregroundColor(.routeText)
+                            .font(.worldCupHeadline)
+                            .foregroundColor(.wc_textPrimary)
                         Text("Solo los partidos marcados están disponibles para narración")
-                            .font(.caption)
-                            .foregroundColor(.routeMuted)
+                            .font(.worldCupCaption)
+                            .foregroundColor(.wc_textSecondary)
                             .multilineTextAlignment(.center)
                     }
-                    .padding()
-                    .liquidGlass(intensity: .medium, cornerRadius: 16, padding: 0)
-                    .padding(.horizontal)
+                    .padding(24)
+                    .usaGlassCard(cornerRadius: 20)
+                    .padding(.horizontal, 20)
                     .accessibilityElement(children: .combine)
                     .accessibilityLabel("Este partido aún no está disponible. Solo los partidos marcados están disponibles para narración")
                 }
@@ -127,36 +142,36 @@ struct NarratorView: View {
                 Spacer()
                 
                 if let match = selectedMatch, match.isActive {
-                    VStack(spacing: 12) {
+                    VStack(spacing: 16) {
                         // Información del partido seleccionado
                         HStack {
-                            VStack(alignment: .leading, spacing: 4) {
+                            VStack(alignment: .leading, spacing: 6) {
                                 Text(match.displayName)
-                                    .font(.headline)
-                                    .foregroundColor(.routeText)
+                                    .font(.worldCupHeadline)
+                                    .foregroundColor(.wc_textPrimary)
                                     .accessibilityAddTraits(.isHeader)
                                 Text(match.fullInfo)
-                                    .font(.caption)
-                                    .foregroundColor(.routeMuted)
+                                    .font(.worldCupCaption)
+                                    .foregroundColor(.wc_textSecondary)
                             }
                             Spacer()
                             
                             // Indicador de estado
-                            HStack(spacing: 4) {
+                            HStack(spacing: 6) {
                                 Circle()
-                                    .fill(match.status == .live ? Color.red : Color.gray)
-                                    .frame(width: 8, height: 8)
+                                    .fill(match.status == .live ? Color.wc_statusLive : Color.wc_statusPrevious)
+                                    .frame(width: 10, height: 10)
                                 Text(match.status.rawValue)
-                                    .font(.caption)
-                                    .foregroundColor(.routeMuted)
+                                    .font(.worldCupCaption)
+                                    .foregroundColor(.wc_textSecondary)
                             }
                             .accessibilityLabel("Estado: \(match.status.rawValue)")
                             .accessibilityHidden(true)
                         }
-                        .padding(.horizontal)
-                        .padding(.vertical, 12)
-                        .liquidGlass(intensity: .medium, cornerRadius: 16, padding: 0)
-                        .padding(.horizontal)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 16)
+                        .usaGlassCard(cornerRadius: 20)
+                        .padding(.horizontal, 20)
                         .accessibilityElement(children: .combine)
                         .accessibilityLabel("Partido seleccionado: \(match.displayName), \(match.fullInfo), Estado \(match.status.rawValue)")
                         
@@ -168,9 +183,9 @@ struct NarratorView: View {
                                 }
                             }
                             .pickerStyle(.menu)
-                            .liquidGlass(intensity: .medium, cornerRadius: 12, padding: 0)
-                            .foregroundColor(.routeText)
-                            .padding(.horizontal)
+                            .usaGlassCard(cornerRadius: 16)
+                            .foregroundColor(.wc_textPrimary)
+                            .padding(.horizontal, 20)
                             .onChange(of: selectedVoiceId) { newVoiceId in
                                 print("Voz seleccionada cambiada a: \(newVoiceId)")
                                 if audioPlayer.isPlaying {
@@ -182,24 +197,25 @@ struct NarratorView: View {
                         }
                         
                         // Botones de control
-                        HStack(spacing: 20) {
+                        HStack(spacing: 16) {
                             // Botón Generar Audio
                             Button(action: generateAudio) {
-                                HStack {
+                                HStack(spacing: 8) {
                                     if isLoading {
                                         ProgressView()
                                             .progressViewStyle(CircularProgressViewStyle(tint: .white))
                                     } else {
                                         Image(systemName: "waveform")
+                                            .font(.system(size: 18, weight: .semibold))
                                     }
                                     Text(isLoading ? "Generando..." : "Iniciar Narración")
+                                        .font(.worldCupHeadline)
                                 }
                                 .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(isLoading ? Color.gray : Color.accessibleLime)
-                                .foregroundColor(isLoading ? .white : .routeDarkGreen)
-                                .cornerRadius(12)
-                                .font(.headline)
+                                .padding(.vertical, 16)
+                                .background(isLoading ? Color.gray.opacity(0.6) : Color.wc_usaRed)
+                                .foregroundColor(.wc_usaWhite)
+                                .cornerRadius(16)
                             }
                             .disabled(isLoading)
                             .accessibilityLabel(isLoading ? "Generando narración de audio" : "Iniciar narración")
@@ -208,68 +224,72 @@ struct NarratorView: View {
                             // Botones de reproducción
                             if audioPlayer.duration > 0 {
                                 Button(action: {
-                                    if audioPlayer.isPlaying {
-                                        audioPlayer.pause()
-                                    } else {
-                                        audioPlayer.play()
+                                    withAnimation(.spring()) {
+                                        if audioPlayer.isPlaying {
+                                            audioPlayer.pause()
+                                        } else {
+                                            audioPlayer.play()
+                                        }
                                     }
                                 }) {
                                     Image(systemName: audioPlayer.isPlaying ? "pause.circle.fill" : "play.circle.fill")
-                                        .font(.system(size: 40))
-                                        .foregroundColor(.accessibleLime)
+                                        .font(.system(size: 44))
+                                        .foregroundColor(.wc_usaRed)
                                 }
                                 .accessibilityLabel(audioPlayer.isPlaying ? "Pausar narración" : "Reproducir narración")
                                 .accessibilityHint(audioPlayer.isPlaying ? "Toca para pausar la narración en reproducción" : "Toca para reanudar la narración")
                                 
                                 Button(action: {
-                                    audioPlayer.stop()
-                                    captions.clear()
+                                    withAnimation(.spring()) {
+                                        audioPlayer.stop()
+                                        captions.clear()
+                                    }
                                 }) {
                                     Image(systemName: "stop.circle.fill")
-                                        .font(.system(size: 40))
-                                        .foregroundColor(.accessibleLime)
+                                        .font(.system(size: 44))
+                                        .foregroundColor(.wc_usaRed)
                                 }
                                 .accessibilityLabel("Detener narración")
                                 .accessibilityHint("Toca para detener completamente la narración")
                             }
                         }
-                        .padding(.horizontal)
+                        .padding(.horizontal, 20)
                         
                         // Barra de progreso del audio con indicador "En vivo"
                         if audioPlayer.duration > 0 {
-                            VStack(spacing: 8) {
+                            VStack(spacing: 12) {
                                 ProgressView(value: audioPlayer.currentTime, total: audioPlayer.duration)
-                                    .progressViewStyle(LinearProgressViewStyle(tint: .accessibleLime))
+                                    .progressViewStyle(LinearProgressViewStyle(tint: .wc_usaRed))
                                     .accessibilityLabel("Progreso de la narración")
                                     .accessibilityValue("Reproduciendo en vivo")
                                 
                                 // Indicador "En vivo" en lugar de tiempos
                                 HStack {
                                     Spacer()
-                                    HStack(spacing: 6) {
+                                    HStack(spacing: 8) {
                                         Circle()
-                                            .fill(Color.red)
-                                            .frame(width: 8, height: 8)
+                                            .fill(Color.wc_statusLive)
+                                            .frame(width: 10, height: 10)
                                             .accessibilityHidden(true)
                                         Text("En vivo")
-                                            .font(.caption)
+                                            .font(.worldCupCaption)
                                             .fontWeight(.semibold)
-                                            .foregroundColor(.routeText)
+                                            .foregroundColor(.wc_textPrimary)
                                     }
                                     Spacer()
                                 }
                                 .accessibilityLabel("Narración en vivo")
                                 .accessibilityHidden(true)
                             }
-                            .padding(.horizontal)
+                            .padding(.horizontal, 20)
                         }
                     }
-                    .padding(.vertical)
-                    .liquidGlass(intensity: .medium, cornerRadius: 20, padding: 0)
-                    .padding(.horizontal)
+                    .padding(.vertical, 20)
+                    .usaGlassCard(cornerRadius: 24)
+                    .padding(.horizontal, 20)
                     .padding(.bottom, 20)
                     .background(
-                        Color.routeDarkGreen
+                        LinearGradient.usaBackground
                             .ignoresSafeArea(edges: .bottom)
                     )
                 }
@@ -284,31 +304,31 @@ struct NarratorView: View {
                         Button(action: {
                             showCaptionHistory = true
                         }) {
-                            HStack(spacing: 8) {
+                            HStack(spacing: 10) {
                                 Image(systemName: "text.bubble.fill")
-                                VStack(alignment: .leading, spacing: 2) {
+                                    .font(.system(size: 16, weight: .semibold))
+                                VStack(alignment: .leading, spacing: 4) {
                                     Text("Ver todos")
-                                        .font(.caption)
+                                        .font(.worldCupCaption)
                                         .fontWeight(.semibold)
                                     
                                     // Mostrar el texto actual si hay subtítulos
                                     if let currentText = captions.lines.last?.text, !currentText.isEmpty {
                                         Text(currentText)
-                                            .font(.caption2)
-                                            .fontWeight(.regular)
+                                            .font(.system(size: 11))
                                             .lineLimit(1)
                                             .truncationMode(.tail)
-                                            .foregroundColor(.routeDarkGreen.opacity(0.8))
+                                            .foregroundColor(.wc_textSecondary)
                                     }
                                 }
                             }
-                            .foregroundColor(.routeDarkGreen)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 10)
-                            .liquidGlass(intensity: .medium, cornerRadius: 20, padding: 0)
+                            .foregroundColor(.wc_textPrimary)
+                            .padding(.horizontal, 18)
+                            .padding(.vertical, 12)
+                            .usaGlassCard(cornerRadius: 20)
                             .overlay(
-                                Capsule()
-                                    .stroke(Color.accessibleLime, lineWidth: 2)
+                                RoundedRectangle(cornerRadius: 20)
+                                    .stroke(Color.wc_usaRed, lineWidth: 2)
                             )
                         }
                         .padding(.trailing, 20)
@@ -351,8 +371,12 @@ struct NarratorView: View {
         // Limpiar subtítulos anteriores
         captions.clear()
         
-        // Obtener el script completo del archivo (el mismo que usará ElevenLabs)
-        let fullScript = match.narrationScript
+        // Determinar idioma de la voz seleccionada
+        let voiceLang = availableVoices.first(where: { $0.id == selectedVoiceId })?.language.lowercased() ?? "es"
+        
+        // Cargar script localizado según la voz seleccionada (si existe), si no, usar por defecto
+        let localized = loadLocalizedScript(baseKey: match.scriptKey, language: voiceLang)
+        let fullScript = localized ?? match.narrationScript
         
         // Parsear el script para preparar los segmentos de subtítulos
         let scriptSegments = ScriptParser.parseScript(fullScript)
@@ -364,12 +388,46 @@ struct NarratorView: View {
         print("⚠️ Estimación de créditos: ~\(Int(Double(fullScript.count) * 1.2)) créditos (modelo turbo)")
         if let selectedVoice = availableVoices.first(where: { $0.id == selectedVoiceId }) {
             print("Voz seleccionada: \(selectedVoice.name) (\(selectedVoice.language))")
+            if match.scriptKey.isEmpty {
+                print("ℹ️ scriptKey vacío en el partido, se usará el guion base.")
+            } else if localized == nil && selectedVoice.language.lowercased() != "es" {
+                print("⚠️ No se encontró guion localizado para \(match.scriptKey)_\(selectedVoice.language.lowercased()).txt. Usando español base.")
+            } else if localized != nil {
+                print("✅ Usando guion localizado: \(match.scriptKey)_\(selectedVoice.language.lowercased()).txt")
+            }
+        }
+        
+        // Fallback: si la voz elegida es EN o FR y notas español en ElevenLabs (posibles IDs no compatibles),
+        // usa TTS nativo de iOS para asegurar idioma correcto, manteniendo subtítulos sincronizados de forma aproximada.
+        if voiceLang == "en" || voiceLang == "fr" {
+            // Detener cualquier reproducción previa
+            audioPlayer.stop()
+            nativeSynthesizer?.stopSpeaking(at: .immediate)
+            
+            // Estimar duración por idioma para sincronizar subtítulos
+            let duration = estimateNativeSpeechDuration(for: fullScript, language: voiceLang)
+            scheduleSubtitles(from: scriptSegments, audioDuration: duration)
+            if let first = scriptSegments.first {
+                captions.push(text: first.trimmingCharacters(in: .whitespaces), keepPrevious: true)
+                lastSubtitleIndex = 0
+            }
+            
+            // Lanzar TTS nativo
+            let synth = AVSpeechSynthesizer()
+            nativeSynthesizer = synth
+            let utterance = AVSpeechUtterance(string: fullScript)
+            utterance.voice = AVSpeechSynthesisVoice(language: voiceLang == "en" ? "en-US" : "fr-FR")
+            utterance.rate = AVSpeechUtteranceDefaultSpeechRate * 0.52 // ritmo cómodo
+            utterance.pitchMultiplier = 1.0
+            utterance.postUtteranceDelay = 0.0
+            synth.speak(utterance)
+            isLoading = false
+            return
         }
         
         Task {
             do {
-                // Usar exactamente el mismo texto del archivo para ElevenLabs
-                // Usando modelo turbo optimizado para reducir consumo de créditos
+                // Usar exactamente el mismo texto cargado para ElevenLabs
                 let audioData = try await elevenLabsService.textToSpeech(
                     text: fullScript,
                     voiceId: selectedVoiceId
@@ -378,25 +436,17 @@ struct NarratorView: View {
                 await MainActor.run {
                     isLoading = false
                     do {
-                        // Preparar el audio player para obtener la duración real
                         let player = try AVAudioPlayer(data: audioData)
                         player.prepareToPlay()
                         let audioDuration = player.duration
-                        
-                        // Ahora programar los subtítulos con la duración real del audio
                         scheduleSubtitles(from: scriptSegments, audioDuration: audioDuration)
-                        
-                        // Mostrar el primer subtítulo inmediatamente al inicio
                         if let firstSegment = scriptSegments.first {
                             captions.push(text: firstSegment.trimmingCharacters(in: .whitespaces), keepPrevious: true)
                             lastSubtitleIndex = 0
                         }
-                        
-                        // Reproducir el audio
                         try audioPlayer.playAudio(from: audioData)
                     } catch {
                         errorMessage = "Error al reproducir audio: \(error.localizedDescription)"
-                        // Limpiar subtítulos si falla la reproducción
                         captions.clear()
                     }
                 }
@@ -461,6 +511,37 @@ struct NarratorView: View {
         subtitleSchedule = schedule
         
         print("✅ Programados \(segments.count) subtítulos correctamente")
+    }
+    
+    // Estimación simple de duración para TTS nativo, según WPM típico por idioma
+    private func estimateNativeSpeechDuration(for text: String, language: String) -> TimeInterval {
+        let words = max(1, text.split(whereSeparator: { $0.isWhitespace || $0.isNewline }).count)
+        let wpm: Double
+        switch language {
+        case "en": wpm = 160.0
+        case "fr": wpm = 150.0
+        default: wpm = 155.0
+        }
+        let minutes = Double(words) / wpm
+        let seconds = minutes * 60.0
+        return max(5.0, seconds)
+    }
+    
+    /// Carga un script localizado `NarrationScripts/<baseKey>_<lang>.txt`. Fallback a `<baseKey>.txt`. Devuelve nil si no hay ninguno.
+    private func loadLocalizedScript(baseKey: String, language: String) -> String? {
+        let normalizedLang = ["es","en","fr","pt"].contains(language) ? language : "es"
+        // 1) Intentar con sufijo de idioma
+        let localizedName = "\(baseKey)_\(normalizedLang)"
+        if let path = Bundle.main.path(forResource: "NarrationScripts/\(localizedName)", ofType: "txt"),
+           let content = try? String(contentsOfFile: path, encoding: .utf8) {
+            return content
+        }
+        // 2) Intentar sin sufijo (base)
+        if let path = Bundle.main.path(forResource: "NarrationScripts/\(baseKey)", ofType: "txt"),
+           let content = try? String(contentsOfFile: path, encoding: .utf8) {
+            return content
+        }
+        return nil
     }
     
     /// Sincroniza los subtítulos con el tiempo actual del audio
@@ -567,13 +648,17 @@ struct MatchCard: View {
     let onSelect: () -> Void
     
     var body: some View {
-        Button(action: onSelect) {
-            HStack(spacing: 12) {
+        Button(action: {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                onSelect()
+            }
+        }) {
+            HStack(spacing: 16) {
                 // Indicador de estado
-                VStack {
+                VStack(spacing: 4) {
                     Circle()
-                        .fill(match.status == .live ? Color.red : Color.gray)
-                        .frame(width: 12, height: 12)
+                        .fill(match.status == .live ? Color.wc_statusLive : Color.wc_statusPrevious)
+                        .frame(width: 14, height: 14)
                         .overlay(
                             Circle()
                                 .stroke(Color.white, lineWidth: 2)
@@ -581,44 +666,44 @@ struct MatchCard: View {
                         .accessibilityHidden(true)
                     if match.status == .live {
                         Text("LIVE")
-                            .font(.system(size: 8, weight: .bold))
-                            .foregroundColor(.red)
+                            .font(.system(size: 9, weight: .bold))
+                            .foregroundColor(.wc_statusLive)
                             .accessibilityHidden(true)
                     }
                 }
                 
                 // Información del partido
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 6) {
                     Text(match.displayName)
-                        .font(.headline)
-                        .foregroundColor(.routeText)
+                        .font(.worldCupHeadline)
+                        .foregroundColor(.wc_textPrimary)
                     
                     Text(match.fullInfo)
-                        .font(.caption)
-                        .foregroundColor(.routeMuted)
+                        .font(.worldCupCaption)
+                        .foregroundColor(.wc_textSecondary)
                 }
                 
                 Spacer()
                 
                 // Icono de play (siempre visible, pero con color diferente si no está activo)
                 Image(systemName: "play.circle.fill")
-                    .font(.title2)
-                    .foregroundColor(match.isActive ? .accessibleLime : .routeMuted)
+                    .font(.system(size: 28, weight: .semibold))
+                    .foregroundColor(match.isActive ? .wc_usaRed : .wc_textTertiary)
                     .accessibilityHidden(true)
                 
                 // Indicador de selección
                 if isSelected {
                     Image(systemName: "checkmark.circle.fill")
-                        .font(.title2)
-                        .foregroundColor(.accessibleLime)
+                        .font(.system(size: 24, weight: .semibold))
+                        .foregroundColor(.wc_usaRed)
                         .accessibilityHidden(true)
                 }
             }
-            .padding()
-            .liquidGlass(intensity: isSelected ? .heavy : .medium, cornerRadius: 12, padding: 0)
+            .padding(20)
+            .usaGlassCard(cornerRadius: 20)
             .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(isSelected ? Color.accessibleLime : Color.clear, lineWidth: 2)
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(isSelected ? Color.wc_usaRed : Color.clear, lineWidth: 2)
             )
         }
         .buttonStyle(PlainButtonStyle())

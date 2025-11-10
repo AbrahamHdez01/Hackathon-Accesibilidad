@@ -25,8 +25,8 @@ class CaptionStore: ObservableObject {
         var sfx: [String] = []
         var ttl: TimeInterval = 4.0
         
-        // Detectar GOL/GOAL
-        if normalizedText.contains("GOL") || normalizedText.contains("GOAL") {
+        // Detectar GOL/GOAL - ALTA INTENSIDAD
+        if normalizedText.contains("GOL") || normalizedText.contains("GOAL") || normalizedText.contains("GOOOOOOL") {
             intensity = .high
             keywords.append("GOL")
             sfx.append("[Celebración]")
@@ -34,18 +34,51 @@ class CaptionStore: ObservableObject {
         }
         
         // Detectar silbato
-        if normalizedText.contains("SILBATO") || normalizedText.contains("WHISTLE") {
+        if normalizedText.contains("SILBATO") || normalizedText.contains("WHISTLE") || normalizedText.contains("SIFFLET") {
             sfx.append("[Silbato]")
         }
         
-        // Detectar tiro/disparo
-        if normalizedText.contains("TIRO") || normalizedText.contains("SHOT") || normalizedText.contains("DISPARA") {
-            intensity = .medium
-            keywords.append("Tiro")
+        // Detectar ATAJADAS ESPECTACULARES - ALTA INTENSIDAD
+        if normalizedText.contains("ATAJADA") || normalizedText.contains("SAVE") || normalizedText.contains("ARRÊT") {
+            intensity = .high
+            keywords.append("ATAJADA")
+            sfx.append("[Aplausos]")
+            ttl = 4.0
         }
         
-        // Detectar jugadores comunes (puedes expandir esta lista)
-        let playerKeywords = ["GIMÉNEZ", "LOZANO", "JIMÉNEZ", "OCHOA", "MESSI", "PULISIC", "DAVID"]
+        // Detectar REMATES/CABECEOS - MEDIA INTENSIDAD
+        if normalizedText.contains("REMATE") || normalizedText.contains("CABECEA") || normalizedText.contains("HEADER") || normalizedText.contains("TÊTE") {
+            intensity = .medium
+            keywords.append("REMATE")
+        }
+        
+        // Detectar DISPAROS/TIROS - MEDIA INTENSIDAD
+        if normalizedText.contains("TIRO") || normalizedText.contains("SHOT") || normalizedText.contains("DISPARA") || normalizedText.contains("FRAPPE") {
+            intensity = .medium
+            keywords.append("DISPARO")
+        }
+        
+        // Detectar TRAVESAÑO/CROSSBAR - ALTA INTENSIDAD (momento dramático)
+        if normalizedText.contains("TRAVESAÑO") || normalizedText.contains("CROSSBAR") || normalizedText.contains("BARRE") {
+            intensity = .high
+            keywords.append("TRAVESAÑO")
+            sfx.append("[Sonido metálico]")
+            ttl = 4.0
+        }
+        
+        // Detectar palabras emocionantes para resaltar
+        let emotionalKeywords = ["ESPECTACULAR", "INCREÍBLE", "GOLAZO", "BRUTAL", "ELECTRIZANTE", "ENLOQUECIDO", "ESTALLA", "EXPLOTA"]
+        for keyword in emotionalKeywords {
+            if normalizedText.contains(keyword) {
+                keywords.append(keyword.capitalized)
+                if intensity == .medium {
+                    intensity = .high // Subir intensidad si hay palabras emocionantes
+                }
+            }
+        }
+        
+        // Detectar jugadores comunes (expandida)
+        let playerKeywords = ["GIMÉNEZ", "LOZANO", "JIMÉNEZ", "OCHOA", "MESSI", "PULISIC", "DAVID", "NEYMAR", "VINICIUS", "RICHARLISON"]
         for keyword in playerKeywords {
             if normalizedText.contains(keyword) {
                 keywords.append(keyword.capitalized)

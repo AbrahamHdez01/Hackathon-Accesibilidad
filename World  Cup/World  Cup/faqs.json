@@ -1,0 +1,157 @@
+{
+  "languages": [
+    {
+      "code": "es",
+      "name": "Español",
+      "faqs": [
+        {
+          "q": "¿Dónde están los baños?",
+          "a": "Los baños están ubicados en cada nivel del estadio, junto a las zonas de comida. También hay baños accesibles señalizados con el símbolo internacional. 🚻"
+        },
+        {
+          "q": "¿Hay Wi-Fi gratis?",
+          "a": "Sí, hay Wi-Fi gratis disponible en todo el estadio. La red se llama STADIUM_FREE. Acepta los términos y condiciones en el portal de acceso."
+        },
+        {
+          "q": "¿Dónde están las zonas accesibles?",
+          "a": "Las zonas accesibles están señalizadas con el símbolo internacional de accesibilidad. Hay elevadores en las entradas principales y rampas en todas las secciones. Consulta el mapa para ubicar la sección más cercana."
+        },
+        {
+          "q": "¿Puedo traer comida?",
+          "a": "Se permite traer comida en contenedores transparentes. No se permiten latas, botellas de vidrio ni alcohol. Hay puestos de comida disponibles en cada nivel."
+        },
+        {
+          "q": "¿Dónde está el estacionamiento?",
+          "a": "El estacionamiento principal está en la zona norte del estadio. Hay espacios reservados para personas con discapacidad cerca de las entradas accesibles. El estacionamiento se llena rápido, te recomendamos llegar temprano."
+        },
+        {
+          "q": "¿Hay servicio médico?",
+          "a": "Sí, hay puestos de primeros auxilios en cada nivel del estadio, señalizados con una cruz roja. Si necesitas ayuda médica, contacta al personal de seguridad más cercano."
+        },
+        {
+          "q": "¿Cómo llego en transporte público?",
+          "a": "El estadio está conectado con varias líneas de metro y autobuses. La estación más cercana es 'Estadio Azteca'. Hay paradas de autobús accesibles en la entrada sur."
+        },
+        {
+          "q": "¿Dónde puedo comprar boletos?",
+          "a": "Los boletos se pueden comprar en las taquillas oficiales ubicadas en las entradas principales, o en línea a través de la página oficial del estadio. Hay descuentos para personas con discapacidad."
+        }
+      ]
+    },
+    {
+      "code": "en",
+      "name": "English",
+      "faqs": [
+        {
+          "q": "Where are the restrooms?",
+          "a": "Restrooms are located on every level of the stadium, next to food courts. There are also accessible restrooms marked with the international symbol. 🚻"
+        },
+        {
+          "q": "Is there free Wi-Fi?",
+          "a": "Yes, free Wi-Fi is available throughout the stadium. The network is called STADIUM_FREE. Accept the terms and conditions on the access portal."
+        },
+        {
+          "q": "Where are the accessible areas?",
+          "a": "Accessible areas are marked with the international accessibility symbol. There are elevators at the main entrances and ramps in all sections. Check the map to find the nearest section."
+        },
+        {
+          "q": "Can I bring food?",
+          "a": "Food is allowed in transparent containers. Cans, glass bottles, and alcohol are not permitted. Food stands are available on every level."
+        },
+        {
+          "q": "Where is the parking?",
+          "a": "The main parking is in the north zone of the stadium. There are reserved spaces for people with disabilities near accessible entrances. Parking fills up quickly, we recommend arriving early."
+        },
+        {
+          "q": "Is there medical service?",
+          "a": "Yes, there are first aid stations on every level of the stadium, marked with a red cross. If you need medical assistance, contact the nearest security personnel."
+        },
+        {
+          "q": "How do I get here by public transport?",
+          "a": "The stadium is connected to several metro and bus lines. The nearest station is 'Estadio Azteca'. There are accessible bus stops at the south entrance."
+        },
+        {
+          "q": "Where can I buy tickets?",
+          "a": "Tickets can be purchased at official ticket offices located at the main entrances, or online through the stadium's official website. There are discounts for people with disabilities."
+        }
+      ]
+    },
+    {
+      "code": "pt",
+      "name": "Português",
+      "faqs": [
+        {
+          "q": "Onde estão os banheiros?",
+          "a": "Os banheiros estão localizados em cada nível do estádio, ao lado das áreas de alimentação. Também há banheiros acessíveis sinalizados com o símbolo internacional. 🚻"
+        },
+        {
+          "q": "Há Wi-Fi gratuito?",
+          "a": "Sim, há Wi-Fi gratuito disponível em todo o estádio. A rede se chama STADIUM_FREE. Aceite os termos e condições no portal de acesso."
+        },
+        {
+          "q": "Onde estão as áreas acessíveis?",
+          "a": "As áreas acessíveis estão sinalizadas com o símbolo internacional de acessibilidade. Há elevadores nas entradas principais e rampas em todas as seções. Consulte o mapa para localizar a seção mais próxima."
+        },
+        {
+          "q": "Posso trazer comida?",
+          "a": "É permitido trazer comida em recipientes transparentes. Latas, garrafas de vidro e álcool não são permitidos. Há barracas de comida disponíveis em cada nível."
+        },
+        {
+          "q": "Onde fica o estacionamento?",
+          "a": "O estacionamento principal fica na zona norte do estádio. Há vagas reservadas para pessoas com deficiência perto das entradas acessíveis. O estacionamento enche rapidamente, recomendamos chegar cedo."
+        },
+        {
+          "q": "Há serviço médico?",
+          "a": "Sim, há postos de primeiros socorros em cada nível do estádio, sinalizados com uma cruz vermelha. Se precisar de assistência médica, entre em contato com o pessoal de segurança mais próximo."
+        },
+        {
+          "q": "Como chego de transporte público?",
+          "a": "O estádio está conectado a várias linhas de metrô e ônibus. A estação mais próxima é 'Estadio Azteca'. Há paradas de ônibus acessíveis na entrada sul."
+        },
+        {
+          "q": "Onde posso comprar ingressos?",
+          "a": "Os ingressos podem ser comprados nas bilheterias oficiais localizadas nas entradas principais, ou online através do site oficial do estádio. Há descontos para pessoas com deficiência."
+        }
+      ]
+    },
+    {
+      "code": "fr",
+      "name": "Français",
+      "faqs": [
+        {
+          "q": "Où sont les toilettes?",
+          "a": "Les toilettes sont situées à chaque niveau du stade, à côté des zones de restauration. Il y a aussi des toilettes accessibles signalées avec le symbole international. 🚻"
+        },
+        {
+          "q": "Y a-t-il du Wi-Fi gratuit?",
+          "a": "Oui, le Wi-Fi gratuit est disponible dans tout le stade. Le réseau s'appelle STADIUM_FREE. Acceptez les termes et conditions sur le portail d'accès."
+        },
+        {
+          "q": "Où sont les zones accessibles?",
+          "a": "Les zones accessibles sont signalées avec le symbole international d'accessibilité. Il y a des ascenseurs aux entrées principales et des rampes dans toutes les sections. Consultez la carte pour trouver la section la plus proche."
+        },
+        {
+          "q": "Puis-je apporter de la nourriture?",
+          "a": "La nourriture est autorisée dans des contenants transparents. Les canettes, bouteilles en verre et l'alcool ne sont pas autorisés. Des stands de nourriture sont disponibles à chaque niveau."
+        },
+        {
+          "q": "Où est le parking?",
+          "a": "Le parking principal se trouve dans la zone nord du stade. Il y a des places réservées pour les personnes handicapées près des entrées accessibles. Le parking se remplit rapidement, nous recommandons d'arriver tôt."
+        },
+        {
+          "q": "Y a-t-il un service médical?",
+          "a": "Oui, il y a des postes de premiers secours à chaque niveau du stade, signalés par une croix rouge. Si vous avez besoin d'assistance médicale, contactez le personnel de sécurité le plus proche."
+        },
+        {
+          "q": "Comment y arriver en transport public?",
+          "a": "Le stade est connecté à plusieurs lignes de métro et de bus. La station la plus proche est 'Estadio Azteca'. Il y a des arrêts de bus accessibles à l'entrée sud."
+        },
+        {
+          "q": "Où puis-je acheter des billets?",
+          "a": "Les billets peuvent être achetés aux guichets officiels situés aux entrées principales, ou en ligne via le site officiel du stade. Il y a des réductions pour les personnes handicapées."
+        }
+      ]
+    }
+  ]
+}
+

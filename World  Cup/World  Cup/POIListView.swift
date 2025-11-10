@@ -11,7 +11,14 @@ struct POIListView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.routeDarkGreen.ignoresSafeArea()
+                // Fondo con gradiente México
+                LinearGradient.mexicoBackground
+                    .ignoresSafeArea()
+                
+                // Franjas sutiles inclinadas (textura papel picado tenue)
+                DiagonalStripesPattern()
+                    .opacity(0.05)
+                    .ignoresSafeArea()
                 
                 VStack(spacing: 0) {
                     // Filtro por tipo
@@ -34,11 +41,11 @@ struct POIListView: View {
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text("Inicio:")
                                         .font(.caption)
-                                        .foregroundColor(.routeMuted)
+                                        .foregroundColor(.wc_routeMuted)
                                     Text(start.name)
                                         .font(.caption)
                                         .fontWeight(.semibold)
-                                        .foregroundColor(.accessibleLime)
+                                        .foregroundColor(.wc_mexLime)
                                 }
                             }
                             
@@ -46,11 +53,11 @@ struct POIListView: View {
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text("Fin:")
                                         .font(.caption)
-                                        .foregroundColor(.routeMuted)
+                                        .foregroundColor(.wc_routeMuted)
                                     Text(end.name)
                                         .font(.caption)
                                         .fontWeight(.semibold)
-                                        .foregroundColor(.accessibleLime)
+                                        .foregroundColor(.wc_mexLime)
                                 }
                             }
                             
@@ -62,15 +69,15 @@ struct POIListView: View {
                             }) {
                                 Text("Limpiar")
                                     .font(.caption)
-                                    .foregroundColor(.routeText)
+                                    .foregroundColor(.wc_routeText)
                                     .padding(.horizontal, 12)
                                     .padding(.vertical, 6)
-                                    .liquidGlass(intensity: .light, cornerRadius: 8, padding: 0)
+                                    .mexicoGlassCard(cornerRadius: 8)
                             }
                         }
                         .padding(.horizontal)
                         .padding(.vertical, 8)
-                        .liquidGlass(intensity: .medium, cornerRadius: 12, padding: 0)
+                        .mexicoGlassCard(cornerRadius: 12)
                         .padding(.horizontal)
                     }
                     
@@ -86,7 +93,7 @@ struct POIListView: View {
                                 // Permitir seleccionar como inicio o fin
                                 handlePOISelection(poi)
                             }
-                            .listRowBackground(Color.routePanelGreen)
+                            .listRowBackground(Color.wc_routePanelGreen)
                         }
                     }
                     .listStyle(.plain)
@@ -145,10 +152,10 @@ struct POIListView: View {
             Text(label)
                 .font(.caption)
                 .fontWeight(selectedType == type ? .semibold : .regular)
-                .foregroundColor(selectedType == type ? .routeDarkGreen : .routeText)
+                .foregroundColor(selectedType == type ? .wc_mexGreen : .wc_textPrimary)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
-                .background(selectedType == type ? Color.accessibleLime : Color.routePanelGreen)
+                .background(selectedType == type ? Color.wc_mexLime : Color.wc_mexGreen.opacity(0.3))
                 .cornerRadius(8)
         }
     }
@@ -165,28 +172,28 @@ struct POIListRow: View {
     var body: some View {
         Button(action: onSelect) {
             HStack(spacing: 12) {
-                // Icono según tipo
+                // Icono según tipo (resaltado en verde lima)
                 Image(systemName: iconForType(poi.type))
                     .font(.title3)
-                    .foregroundColor(.accessibleLime)
+                    .foregroundColor(.wc_mexLime)
                     .frame(width: 40, height: 40)
-                    .background(Color.accessibleLime.opacity(0.2))
+                    .background(Color.wc_mexLime.opacity(0.2))
                     .clipShape(Circle())
                 
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 8) {
                         Text(poi.name)
                             .font(.headline)
-                            .foregroundColor(.routeText)
+                            .foregroundColor(.wc_routeText)
                         
                         if isStart {
-                            Text("INICIO")
-                                .font(.caption2)
-                                .fontWeight(.bold)
-                                .foregroundColor(.routeDarkGreen)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(Color.accessibleLime)
+                                    Text("INICIO")
+                                        .font(.caption2)
+                                        .fontWeight(.bold)
+                                        .foregroundColor(.wc_mexGreen)
+                                        .padding(.horizontal, 6)
+                                        .padding(.vertical, 2)
+                                        .background(Color.wc_mexLime)
                                 .cornerRadius(4)
                         }
                         
@@ -204,7 +211,7 @@ struct POIListRow: View {
                     
                     Text(poi.description)
                         .font(.caption)
-                        .foregroundColor(.routeMuted)
+                        .foregroundColor(.wc_routeMuted)
                     
                     // Indicadores de accesibilidad
                     if poi.accessibility.wheelchairAccessible {
@@ -214,7 +221,7 @@ struct POIListRow: View {
                             Text("Accesible")
                                 .font(.caption2)
                         }
-                        .foregroundColor(.accessibleLime)
+                        .foregroundColor(.wc_mexLime)
                     }
                 }
                 
@@ -229,9 +236,9 @@ struct POIListRow: View {
                     }) {
                         Image(systemName: isStart ? "location.fill" : "location")
                             .font(.caption)
-                            .foregroundColor(isStart ? .accessibleLime : .routeMuted)
+                            .foregroundColor(isStart ? .wc_mexLime : .wc_textSecondary)
                             .padding(8)
-                            .background(isStart ? Color.accessibleLime.opacity(0.2) : Color.clear)
+                            .background(isStart ? Color.wc_mexLime.opacity(0.2) : Color.clear)
                             .clipShape(Circle())
                     }
                     
@@ -242,7 +249,7 @@ struct POIListRow: View {
                     }) {
                         Image(systemName: isEnd ? "flag.fill" : "flag")
                             .font(.caption)
-                            .foregroundColor(isEnd ? .blue : .routeMuted)
+                            .foregroundColor(isEnd ? .blue : .wc_routeMuted)
                             .padding(8)
                             .background(isEnd ? Color.blue.opacity(0.2) : Color.clear)
                             .clipShape(Circle())

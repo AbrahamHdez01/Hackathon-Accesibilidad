@@ -62,7 +62,7 @@ struct CaptionUtilities {
                     let startIndex = attributedString.index(attributedString.startIndex, offsetByCharacters: safeStart)
                     let endIndex = attributedString.index(startIndex, offsetByCharacters: safeLength)
                     let attributedRange = startIndex..<endIndex
-                    attributedString[attributedRange].foregroundColor = .accessibleLime
+                    attributedString[attributedRange].foregroundColor = .wc_usaRed
                     attributedString[attributedRange].font = baseFont.bold()
                 }
                 

@@ -11,7 +11,9 @@ struct AccessibleRouteScreen: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.routeDarkGreen.ignoresSafeArea()
+                // Fondo sólido verde fuerte (sin gradiente rainbow)
+                Color.wc_mexGreen
+                    .ignoresSafeArea()
 
                 ZStack {
                     // Mapa 3D - ocupa todo el espacio disponible
@@ -28,10 +30,10 @@ struct AccessibleRouteScreen: View {
                     VStack(spacing: 12) {
                         // Título y controles
                         HStack(spacing: 12) {
-                            VStack(alignment: .leading, spacing: 4) {
+                            VStack(alignment: .leading, spacing: 8) {
                                 Text("Ruta ideal")
-                                    .font(.system(size: 24, weight: .bold, design: .rounded))
-                                    .foregroundColor(.routeText)
+                                    .font(.worldCupTitle)
+                                    .foregroundColor(.wc_textPrimary)
                                     .accessibilityAddTraits(.isHeader)
                                 
                                 // Selector de modo compacto
@@ -55,84 +57,87 @@ struct AccessibleRouteScreen: View {
                             
                             Spacer()
                             
-                            // Botón Ver POIs
+                            // Botón Ver POIs (resaltado en verde lima)
                             Button(action: {
                                 showPOIList.toggle()
                             }) {
                                 Image(systemName: "list.bullet")
                                     .font(.system(size: 18, weight: .semibold))
-                                    .foregroundColor(.accessibleLime)
-                                    .padding(10)
-                                    .liquidGlass(intensity: .medium, cornerRadius: 20)
+                                    .foregroundColor(.wc_mexLime)
+                                    .padding(12)
+                                    .mexicoGlassCard(cornerRadius: 20)
                             }
                             .accessibilityLabel("Ver lista de puntos de interés")
                             .accessibilityHint("Doble toque para abrir la lista de puntos de interés")
                         }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 12)
-                        .liquidGlass(intensity: .medium, cornerRadius: 20, padding: 0)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 16)
+                        .mexicoGlassCard(cornerRadius: 24)
                         .padding(.horizontal, 16)
                         .padding(.top, 8)
                         
                         // Información de selección (solo si hay selección)
                         if let start = poiService.selectedStartPOI, let end = poiService.selectedEndPOI {
                             HStack(spacing: 12) {
-                                VStack(alignment: .leading, spacing: 4) {
+                                VStack(alignment: .leading, spacing: 6) {
                                     Text("Origen: \(start.name)")
-                                        .font(.caption)
-                                        .foregroundColor(.routeText)
+                                        .font(.worldCupCaption)
+                                        .foregroundColor(.wc_textPrimary)
                                     Text("Destino: \(end.name)")
-                                        .font(.caption)
-                                        .foregroundColor(.routeText)
+                                        .font(.worldCupCaption)
+                                        .foregroundColor(.wc_textPrimary)
                                 }
                                 Spacer()
                                 Button(action: {
-                                    poiService.selectedStartPOI = nil
-                                    poiService.selectedEndPOI = nil
-                                    currentRoute = nil
+                                    withAnimation(.spring()) {
+                                        poiService.selectedStartPOI = nil
+                                        poiService.selectedEndPOI = nil
+                                        currentRoute = nil
+                                    }
                                 }) {
                                     Text("Limpiar")
-                                        .font(.caption)
-                                        .foregroundColor(.routeText)
-                                        .padding(.horizontal, 12)
-                                        .padding(.vertical, 6)
-                                        .liquidGlass(intensity: .light, cornerRadius: 8, padding: 0)
+                                        .font(.worldCupCaption)
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(.wc_textPrimary)
+                                        .padding(.horizontal, 16)
+                                        .padding(.vertical, 8)
+                                        .mexicoGlassCard(cornerRadius: 12)
                                 }
                             }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 10)
-                            .liquidGlass(intensity: .medium, cornerRadius: 12, padding: 0)
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 14)
+                            .mexicoGlassCard(cornerRadius: 16)
                             .padding(.horizontal, 16)
                         }
                         
                         Spacer()
                     }
                     
-                    // Instrucciones flotantes en la parte inferior
+                    // Instrucciones flotantes en la parte media-inferior
                     VStack {
                         Spacer()
                         
                         if poiService.selectedStartPOI == nil {
                             Text("Toca un punto para seleccionar origen")
-                                .font(.caption)
-                                .foregroundColor(.routeText)
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 10)
-                                .liquidGlass(intensity: .heavy, cornerRadius: 12, padding: 0)
-                                .padding(.bottom, 100) // Por encima del tab bar
+                                .font(.worldCupHeadline)
+                                .foregroundColor(.wc_textPrimary)
+                                .padding(.horizontal, 24)
+                                .padding(.vertical, 16)
+                                .mexicoGlassCard(cornerRadius: 20)
+                                .padding(.bottom, 180)
                         } else if poiService.selectedEndPOI == nil {
                             Text("Toca otro punto para seleccionar destino")
-                                .font(.caption)
-                                .foregroundColor(.routeText)
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 10)
-                                .liquidGlass(intensity: .heavy, cornerRadius: 12, padding: 0)
-                                .padding(.bottom, 100) // Por encima del tab bar
+                                .font(.worldCupHeadline)
+                                .foregroundColor(.wc_textPrimary)
+                                .padding(.horizontal, 24)
+                                .padding(.vertical, 16)
+                                .mexicoGlassCard(cornerRadius: 20)
+                                .padding(.bottom, 180)
                         }
                     }
                     .allowsHitTesting(false) // No bloquear gestos del mapa
                     
-                    // Botón desplegable de ruta calculada (flotante en la parte inferior)
+                    // Botón desplegable de ruta calculada (flotante en la parte media-inferior)
                     VStack {
                         Spacer()
                         
@@ -146,56 +151,58 @@ struct AccessibleRouteScreen: View {
                                 }) {
                                     HStack {
                                         Text("Ruta calculada")
-                                            .font(.headline)
-                                            .foregroundColor(.routeText)
+                                            .font(.worldCupHeadline)
+                                            .foregroundColor(.wc_textPrimary)
                                         Spacer()
                                         HStack(spacing: 8) {
-                                            Text("\(Int(route.estimatedTime / 60)) min")
-                                                .font(.caption)
-                                                .foregroundColor(.routeMuted)
+                                            Text(formatEstimatedTime(route.estimatedTime))
+                                                .font(.worldCupBody)
+                                                .fontWeight(.semibold)
+                                                .foregroundColor(.wc_mexLime)
                                             Image(systemName: showRouteDetails ? "chevron.down" : "chevron.up")
-                                                .font(.caption)
-                                                .foregroundColor(.accessibleLime)
+                                                .font(.worldCupCaption)
+                                                .foregroundColor(.wc_mexLime)
                                         }
                                     }
-                                    .padding(.horizontal, 16)
-                                    .padding(.vertical, 12)
+                                    .padding(.horizontal, 20)
+                                    .padding(.vertical, 16)
                                 }
                                 
                                 // Contenido desplegable
                                 if showRouteDetails {
-                                    VStack(alignment: .leading, spacing: 8) {
-                                        Divider()
-                                            .background(Color.routeMuted.opacity(0.3))
+                                        VStack(alignment: .leading, spacing: 12) {
+                                            Divider()
+                                                .background(Color.wc_textSecondary.opacity(0.3))
                                         
                                         ScrollView(.horizontal, showsIndicators: false) {
-                                            HStack(spacing: 8) {
+                                            HStack(spacing: 12) {
                                                 ForEach(route.instructions, id: \.self) { instruction in
                                                     Text(instruction)
-                                                        .font(.caption)
-                                                        .foregroundColor(.routeText)
-                                                        .padding(.horizontal, 12)
-                                                        .padding(.vertical, 6)
-                                                        .liquidGlass(intensity: .light, cornerRadius: 8, padding: 0)
+                                                        .font(.worldCupCaption)
+                                                        .foregroundColor(.wc_textPrimary)
+                                                        .padding(.horizontal, 16)
+                                                        .padding(.vertical, 10)
+                                                        .mexicoGlassCard(cornerRadius: 12)
                                                 }
                                             }
+                                            .padding(.horizontal, 4)
                                         }
                                     }
-                                    .padding(.horizontal, 16)
-                                    .padding(.bottom, 12)
+                                    .padding(.horizontal, 20)
+                                    .padding(.bottom, 16)
                                     .transition(.opacity.combined(with: .move(edge: .bottom)))
                                 }
                             }
-                            .liquidGlass(intensity: .medium, cornerRadius: 16, padding: 0)
+                            .mexicoGlassCard(cornerRadius: 20)
                             .padding(.horizontal, 16)
-                            .padding(.bottom, 100) // Por encima del tab bar
+                            .padding(.bottom, 180)
                         }
                     }
                     
-                    // Tab inferior (3 botones) - siempre visible
+                    // Tab inferior (3 botones) - siempre visible con gradiente World Cup
                     VStack {
                         Spacer()
-                        HStack(spacing: 18) {
+                        HStack(spacing: 20) {
                             NavigationLink(destination: NarratorView()) {
                                 tabItem(icon: "megaphone.fill", title: "Narrador\nUniversal", isCurrent: false)
                             }
@@ -206,11 +213,11 @@ struct AccessibleRouteScreen: View {
                                 tabItem(icon: "bubble.left.and.bubble.right.fill", title: "Asistente\nMultilingüe", isCurrent: false)
                             }
                         }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 12)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 16)
                         .background(
                             RoundedCorner(radius: 28, corners: [.topLeft, .topRight])
-                                .fill(Color.routePanelGreen.opacity(0.95))
+                                .fill(.ultraThinMaterial)
                                 .shadow(color: .black.opacity(0.2), radius: 12, x: 0, y: -2)
                         )
                     }
@@ -281,6 +288,16 @@ struct AccessibleRouteScreen: View {
             }
             // Si ya hay inicio pero no fin, seleccionar como fin
             else if poiService.selectedEndPOI == nil && poi.id != poiService.selectedStartPOI?.id {
+                // Evitar seleccionar puntos demasiado cercanos entre sí
+                if let start = poiService.selectedStartPOI {
+                    let dx = poi.coordinates.x - start.coordinates.x
+                    let dz = poi.coordinates.z - start.coordinates.z
+                    let dist = sqrt(dx*dx + dz*dz)
+                    if dist < 8.0 {
+                        // Si están muy cerca, ignorar para mantener separación notoria
+                        return
+                    }
+                }
                 poiService.selectedEndPOI = poi
             }
             // Si ambos están seleccionados y se toca el inicio, cambiarlo
@@ -311,18 +328,42 @@ struct AccessibleRouteScreen: View {
         
     
 
+    // MARK: - Helper Functions
+    
+    private func formatEstimatedTime(_ timeInSeconds: TimeInterval) -> String {
+        let totalSeconds = Int(timeInSeconds)
+        let minutes = totalSeconds / 60
+        let seconds = totalSeconds % 60
+        
+        // Asegurar que siempre muestre al menos 1 minuto si hay una ruta válida
+        if minutes == 0 && seconds < 30 {
+            return "~1 min"
+        } else if minutes == 0 {
+            return "~1 min"
+        } else if seconds < 30 {
+            return "\(minutes) min"
+        } else {
+            return "~\(minutes + 1) min"
+        }
+    }
+    
     // MARK: - Subviews
 
     private func modeButton(label: String, isActive: Bool, highlight: Bool = false, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
+        Button(action: {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                action()
+            }
+        }) {
             Text(label)
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundColor(isActive ? .black : .routeText)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
+                .font(.worldCupCaption)
+                .fontWeight(.semibold)
+                .foregroundColor(isActive ? (highlight ? .black : .wc_textPrimary) : .wc_textPrimary)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
                 .background(
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .fill(isActive ? (highlight ? Color.accessibleLime : Color.white.opacity(0.15)) : Color.white.opacity(0.12))
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(isActive ? (highlight ? Color.wc_mexLime : Color.wc_mexRed.opacity(0.7)) : Color.white.opacity(0.15))
                 )
         }
         .accessibilityLabel("Modo de ruta: \(label)")
@@ -331,22 +372,23 @@ struct AccessibleRouteScreen: View {
     }
 
     private func tabItem(icon: String, title: String, isCurrent: Bool) -> some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 10) {
             ZStack {
                 Circle()
-                    .fill(isCurrent ? Color.accessibleLime.opacity(0.25) : Color.white.opacity(0.10))
-                    .frame(width: 48, height: 48)
+                    .fill(isCurrent ? Color.wc_mexLime.opacity(0.3) : Color.white.opacity(0.15))
+                    .frame(width: 56, height: 56)
                 Image(systemName: icon)
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundColor(isCurrent ? .accessibleLime : .routeText)
+                    .font(.system(size: 22, weight: .semibold))
+                    .foregroundColor(isCurrent ? .wc_mexLime : .wc_textPrimary)
             }
             Text(title)
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundColor(.routeMuted)
+                .font(.worldCupCaption)
+                .fontWeight(.semibold)
+                .foregroundColor(isCurrent ? .wc_textPrimary : .wc_textSecondary)
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 8)
+        .padding(.vertical, 10)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(title)
         .accessibilityHint(isCurrent ? "Pantalla actual: \(title). Doble toque para cambiar a otra pantalla" : "Doble toque para abrir \(title)")

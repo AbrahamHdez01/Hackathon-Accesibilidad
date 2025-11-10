@@ -18,7 +18,8 @@ class MatchDataService: ObservableObject {
             time: "20:00",
             status: .live,
             narrationScript: loadScript(fileName: "mexico_vs_brasil_live"),
-            isActive: true
+            isActive: true,
+            scriptKey: "mexico_vs_brasil_live"
         )
         
         // Partido PRÓXIMAMENTE (activo)
@@ -31,7 +32,8 @@ class MatchDataService: ObservableObject {
             time: "16:00",
             status: .upcoming,
             narrationScript: loadScript(fileName: "usa_vs_argentina_upcoming"),
-            isActive: true
+            isActive: true,
+            scriptKey: "usa_vs_argentina_upcoming"
         )
         
         // Partido ANTERIORES (activo)
@@ -44,7 +46,8 @@ class MatchDataService: ObservableObject {
             time: "14:00",
             status: .previous,
             narrationScript: loadScript(fileName: "canada_vs_spain_previous"),
-            isActive: true
+            isActive: true,
+            scriptKey: "canada_vs_spain_previous"
         )
         
         // Partidos adicionales (no activos, solo para mostrar)

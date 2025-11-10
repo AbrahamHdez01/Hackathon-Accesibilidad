@@ -10,18 +10,18 @@ struct Stadium3DView: UIViewRepresentable {
     var currentRoute: Route?
     
     // Ajustes de cámara/gestos
-    private let minDistance: Float = 3.0
-    private let maxDistance: Float = 60.0
-    private let panSpeed: Float = 0.01  // Reducido de 0.02 para movimiento más lento
+    private let minDistance: Float = 10.0  // Distancia mínima (altura mínima)
+    private let maxDistance: Float = 60.0  // Distancia máxima (altura máxima)
+    private let panSpeed: Float = 0.005  // Reducido aún más para movimiento más suave
     private let zoomSpeed: Float = 0.6   // Reducido de 0.8 para zoom más lento
-    private let initialDistance: Float = 14.0
-    private let initialHeight: Float = 6.0
+    private let initialDistance: Float = 25.0  // Vista isométrica: distancia inicial
+    private let initialHeight: Float = 20.0  // Vista isométrica: altura inicial
     
     // Límites de elevación (pitch) de la órbita
-    // x negativo = mirar hacia abajo; permitimos casi top-down (-~86°)
-    private let minOrbitPitch: Float = -1.50   // ~ -86º (arriba)
-    private let maxOrbitPitch: Float = 0.60    // ~ 34º  (no dejar ver "desde abajo")
-    private let orbitPanSensitivity: Float = 0.002 // Reducido de 0.005 para movimiento más lento
+    // Permitir rotación completa de 360 grados sobre el eje X
+    private let minOrbitPitch: Float = -Float.pi  // Rotación completa hacia abajo
+    private let maxOrbitPitch: Float = Float.pi   // Rotación completa hacia arriba
+    private let orbitPanSensitivity: Float = 0.001 // Reducido para rotación más suave y controlada
     
     func makeUIView(context: Context) -> SCNView {
         let sceneView = SCNView()
@@ -115,9 +115,16 @@ struct Stadium3DView: UIViewRepresentable {
         let orbitNode = SCNNode()
         targetNode.addChildNode(orbitNode)
         
-        // cameraNode se coloca atrás/arriba mirando al target
+        // Vista inicial isométrica (3/4): ángulo similar a la foto
+        // Pitch negativo = mirar hacia abajo (aproximadamente -40 grados = -0.7 radianes)
+        // Esto da una vista isométrica/3D en lugar de completamente top-down
+        orbitNode.eulerAngles = SCNVector3(-0.7, 0, 0)  // Vista isométrica
+        
+        // cameraNode se coloca en posición isométrica
         let cameraNode = SCNNode()
         cameraNode.camera = SCNCamera()
+        // Vista isométrica: la cámara está a una distancia diagonal del target
+        // Usar distancia y altura para crear el ángulo isométrico
         cameraNode.position = SCNVector3(0, initialHeight, initialDistance)
         
         // Mirar siempre al target
@@ -132,8 +139,10 @@ struct Stadium3DView: UIViewRepresentable {
         context.coordinator.cameraNode = cameraNode
         context.coordinator.targetNode = targetNode
         context.coordinator.orbitNode = orbitNode
-        context.coordinator.currentDistance = initialDistance
-        context.coordinator.initialDistance = initialDistance
+        // Calcular distancia inicial basada en altura y distancia Z
+        let initialTotalDistance = sqrt(initialHeight * initialHeight + initialDistance * initialDistance)
+        context.coordinator.currentDistance = initialTotalDistance
+        context.coordinator.initialDistance = initialTotalDistance
         context.coordinator.initialHeight = initialHeight
         
         // Límites/sensibilidad de pitch
@@ -226,8 +235,9 @@ struct Stadium3DView: UIViewRepresentable {
         let sphere = SCNSphere(radius: 0.6)
         let material = SCNMaterial()
         
-        // Color según tipo (inicio = verde, fin = azul)
-        let startColor = UIColor(red: 0.66, green: 1.0, blue: 0.24, alpha: 1.0) // Verde
+        // Color según tipo (inicio = verde fuerte, fin = azul)
+        // Verde más fuerte: #7FFF00 (Chartreuse) = RGB(127, 255, 0)
+        let startColor = UIColor(red: 0.5, green: 1.0, blue: 0.0, alpha: 1.0) // Verde fuerte (Chartreuse)
         let endColor = UIColor(red: 0.0, green: 0.5, blue: 1.0, alpha: 1.0) // Azul
         
         let nodeColor = isStart ? startColor : (isEnd ? endColor : (poi.accessibility.wheelchairAccessible ? startColor : endColor))
@@ -329,10 +339,15 @@ struct Stadium3DView: UIViewRepresentable {
     private func createRouteNodes(points: [RoutePoint], isAccessible: Bool, scene: SCNScene, context: Context) {
         guard points.count >= 2 else { return }
         
-        // Colores
-        let accessibleColor = UIColor(red: 0.66, green: 1.0, blue: 0.24, alpha: 1.0)
-        let standardColor = UIColor(red: 0.0, green: 0.5, blue: 1.0, alpha: 1.0)
+        // Colores MUY contrastantes para diferenciar claramente las rutas
+        // Verde brillante para rutas accesibles: #7FFF00 (Chartreuse) = RGB(127, 255, 0)
+        let accessibleColor = UIColor(red: 0.5, green: 1.0, blue: 0.0, alpha: 1.0) // Verde brillante Chartreuse
+        // Azul MUY diferente para rutas estándar: #0066FF (Azul estándar) - más oscuro y saturado
+        let standardColor = UIColor(red: 0.0, green: 0.3, blue: 1.0, alpha: 1.0) // Azul más oscuro y saturado
         let routeColor = isAccessible ? accessibleColor : standardColor
+        
+        // Debug: verificar que se está usando el color correcto
+        print("🔵 Creando ruta: isAccessible=\(isAccessible), color=\(isAccessible ? "VERDE BRILLANTE" : "AZUL OSCURO")")
         
         // Crear líneas entre puntos usando tubos 3D para mejor visibilidad
         for i in 0..<points.count - 1 {
@@ -388,27 +403,18 @@ struct Stadium3DView: UIViewRepresentable {
             context.coordinator.routeNodes.append(cylinderNode)
         }
         
-        // Crear esferas más grandes y visibles en cada punto de la ruta
+        // Crear esfera SOLO en inicio y fin para evitar nodos intermedios
         for (index, point) in points.enumerated() {
+            guard index == 0 || index == points.count - 1 else { continue }
             let sphere = SCNSphere(radius: 0.4)
             let sphereMaterial = SCNMaterial()
-            
-            // Esfera más brillante para inicio y fin
-            if index == 0 || index == points.count - 1 {
-                sphereMaterial.diffuse.contents = routeColor
-                sphereMaterial.emission.contents = routeColor.withAlphaComponent(1.0)
-            } else {
-                sphereMaterial.diffuse.contents = routeColor
-                sphereMaterial.emission.contents = routeColor.withAlphaComponent(0.6)
-            }
-            
+            sphereMaterial.diffuse.contents = routeColor
+            sphereMaterial.emission.contents = routeColor.withAlphaComponent(1.0)
             sphere.materials = [sphereMaterial]
             
             let sphereNode = SCNNode(geometry: sphere)
             // Asegurar que estén en el suelo - todas las rutas deben estar en y=0
-            // Para rutas exteriores, siempre en el suelo
-            let isExteriorRoute = abs(point.position.x) > 10 || abs(point.position.z) > 10
-            let groundY: Float = isExteriorRoute ? 0.0 : max(0.0, point.position.y)
+            let groundY: Float = 0.0
             sphereNode.position = SCNVector3(
                 point.position.x,
                 groundY + 0.4,
@@ -530,26 +536,38 @@ struct Stadium3DView: UIViewRepresentable {
         }
         
         @objc func handleDoubleTap(_ gesture: UITapGestureRecognizer) {
-            // Reset de cámara
+            // Reset de cámara a vista isométrica inicial
             guard let cameraNode = cameraNode,
                   let targetNode = targetNode,
                   let orbitNode = orbitNode else { return }
             
-            currentDistance = initialDistance
-            cameraNode.position = SCNVector3(0, initialHeight, currentDistance)
+            // Calcular distancia inicial total
+            let initialTotalDistance = sqrt(initialHeight * initialHeight + initialDistance * initialDistance)
+            currentDistance = initialTotalDistance
+            
+            // Reset a vista isométrica inicial
+            orbitNode.eulerAngles = SCNVector3(-0.7, 0, 0)
+            cameraNode.position = SCNVector3(0, initialHeight, initialDistance)
             targetNode.position = SCNVector3Zero
-            orbitNode.eulerAngles = SCNVector3Zero
         }
         
         @objc func handlePinch(_ gesture: UIPinchGestureRecognizer) {
-            guard let cameraNode = cameraNode else { return }
+            guard let cameraNode = cameraNode,
+                  let orbitNode = orbitNode else { return }
             if gesture.state == .changed {
                 let factor = Float(gesture.scale)
                 // Corregir zoom invertido: cuando factor > 1 (pinch out) debe acercar (reducir distancia)
                 // Cuando factor < 1 (pinch in) debe alejar (aumentar distancia)
                 let proposed = currentDistance / factor // Invertir la lógica
                 currentDistance = max(minDistance, min(maxDistance, proposed))
-                cameraNode.position.z = currentDistance
+                
+                // Actualizar posición de la cámara basada en el ángulo actual
+                // Calcular posición basada en el pitch actual y la distancia
+                let pitch = orbitNode.eulerAngles.x
+                let height = currentDistance * sin(-pitch)
+                let distance = currentDistance * cos(-pitch)
+                cameraNode.position = SCNVector3(0, height, distance)
+                
                 gesture.scale = 1.0
             }
         }
@@ -588,7 +606,8 @@ struct Stadium3DView: UIViewRepresentable {
             let r = normalize(rightXZ)
             let f = normalize(forwardXZ)
             
-            let scale = panSpeed * max(1, currentDistance * 0.5)
+            // Reducir aún más la escala del movimiento para que sea más suave
+            let scale = panSpeed * max(0.5, currentDistance * 0.3)
             
             let dx = Float(translation.x) * scale
             let dy = Float(translation.y) * scale
@@ -597,19 +616,34 @@ struct Stadium3DView: UIViewRepresentable {
             targetNode.position = targetNode.position + move
         }
         
-        // Pan de 2 dedos: órbita yaw/pitch (incluye mirar "desde arriba")
+        // Pan de 2 dedos: órbita yaw/pitch (rotación completa permitida)
         @objc func handleOrbitPan(_ gesture: UIPanGestureRecognizer) {
             guard let orbitNode = orbitNode,
+                  let cameraNode = cameraNode,
                   let view = sceneView else { return }
             let t = gesture.translation(in: view)
             gesture.setTranslation(.zero, in: view)
             
-            // Horizontal → yaw
+            // Horizontal → yaw (rotación alrededor del eje Y)
             orbitNode.eulerAngles.y += Float(t.x) * orbitPanSensitivity
             
-            // Vertical → pitch (invertido para que arrastrar hacia arriba “levante” la cámara)
+            // Vertical → pitch (rotación alrededor del eje X, permitir rotación completa)
             let desiredPitch = orbitNode.eulerAngles.x + Float(-t.y) * orbitPanSensitivity
-            orbitNode.eulerAngles.x = clamp(desiredPitch, minOrbitPitch, maxOrbitPitch)
+            // Permitir rotación completa normalizando el ángulo entre -π y π
+            var normalizedPitch = desiredPitch
+            while normalizedPitch > Float.pi {
+                normalizedPitch -= 2 * Float.pi
+            }
+            while normalizedPitch < -Float.pi {
+                normalizedPitch += 2 * Float.pi
+            }
+            orbitNode.eulerAngles.x = normalizedPitch
+            
+            // Actualizar posición de la cámara basada en el nuevo ángulo
+            let pitch = orbitNode.eulerAngles.x
+            let height = currentDistance * sin(-pitch)
+            let distance = currentDistance * cos(-pitch)
+            cameraNode.position = SCNVector3(0, height, distance)
         }
         
         private func clamp(_ v: Float, _ minV: Float, _ maxV: Float) -> Float {

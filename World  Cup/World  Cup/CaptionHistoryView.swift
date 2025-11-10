@@ -8,22 +8,34 @@ struct CaptionHistoryView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.routeDarkGreen.ignoresSafeArea()
+                // Fondo con gradiente USA (igual que NarratorView)
+                LinearGradient.usaBackground
+                    .ignoresSafeArea()
+                
+                // Micro-estrellas difuminadas
+                StarsPattern()
+                    .opacity(0.3)
+                    .ignoresSafeArea()
+                
+                // Banda diagonal "broadcast"
+                BroadcastBand()
+                    .opacity(0.4)
+                    .ignoresSafeArea()
                 
                 if store.lines.isEmpty {
                     VStack(spacing: 16) {
                         Image(systemName: "text.bubble")
                             .font(.system(size: 60))
-                            .foregroundColor(.routeMuted)
+                            .foregroundColor(.wc_textSecondary)
                             .accessibilityHidden(true)
                         
                         Text("No hay subtítulos aún")
                             .font(.headline)
-                            .foregroundColor(.routeText)
+                            .foregroundColor(.wc_textPrimary)
                         
                         Text("Los subtítulos aparecerán aquí cuando comience la narración")
                             .font(.subheadline)
-                            .foregroundColor(.routeMuted)
+                            .foregroundColor(.wc_textSecondary)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal)
                     }
@@ -59,7 +71,7 @@ struct CaptionHistoryView: View {
                     Button("Cerrar") {
                         dismiss()
                     }
-                    .foregroundColor(.accessibleLime)
+                    .foregroundColor(.wc_usaRed)
                 }
             }
             .accessibilityLabel("Pantalla de subtítulos completos")
@@ -73,10 +85,10 @@ struct CaptionHistoryRow: View {
     
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
-            // Barra lateral de color para alta intensidad
+            // Barra lateral de color para alta intensidad (rojo USA)
             if line.intensity == .high {
                 RoundedRectangle(cornerRadius: 3)
-                    .fill(Color.accessibleLime)
+                    .fill(Color.wc_usaRed)
                     .frame(width: 4)
                     .padding(.top, 4)
             }
@@ -88,10 +100,10 @@ struct CaptionHistoryRow: View {
                         ForEach(line.sfx, id: \.self) { sfx in
                             Text(sfx)
                                 .font(.system(.caption, design: .rounded, weight: .semibold))
-                                .foregroundColor(.accessibleLime)
+                                .foregroundColor(.wc_usaRed)
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 4)
-                                .background(Color.accessibleLime.opacity(0.2))
+                                .background(Color.wc_usaRed.opacity(0.2))
                                 .cornerRadius(6)
                         }
                     }
@@ -101,24 +113,21 @@ struct CaptionHistoryRow: View {
                 Text(CaptionUtilities.attributedText(for: line))
                     .font(.system(.body, design: .rounded, weight: .medium))
                     .multilineTextAlignment(.leading)
-                    .foregroundColor(.routeText)
+                    .foregroundColor(.wc_textPrimary)
                 
                 // Timestamp (opcional)
                 Text(formatTimestamp(line.timestamp))
                     .font(.system(.caption2, design: .rounded))
-                    .foregroundColor(.routeMuted)
+                    .foregroundColor(.wc_textSecondary)
             }
             
             Spacer()
         }
         .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(Color.routePanelGreen)
-        )
+        .usaGlassCard(cornerRadius: 12)
         .overlay(
             RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .stroke(line.intensity == .high ? Color.accessibleLime.opacity(0.5) : Color.clear, lineWidth: 1)
+                .stroke(line.intensity == .high ? Color.wc_usaRed.opacity(0.5) : Color.clear, lineWidth: 1)
         )
         .accessibilityElement(children: .combine)
         .accessibilityLabel(buildAccessibilityLabel())
